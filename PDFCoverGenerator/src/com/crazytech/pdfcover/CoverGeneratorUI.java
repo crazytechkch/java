@@ -38,6 +38,7 @@ import com.crazytech.io.IOUtil;
 import com.crazytech.pdfcover.prog.GenerateCover;
 import com.crazytech.pdfcover.prog.GenerateJson;
 import com.crazytech.pdfcover.prog.GenerateSQL;
+import com.crazytech.pdfcover.prog.Pubs;
 import com.crazytech.swing.texteditor.DragDropTextEditor;
 import com.crazytech.swing.texteditor.TextEditor;
 
@@ -175,7 +176,18 @@ public class CoverGeneratorUI extends JFrame implements ClipboardOwner{
 		File dir = new File(src);
 		String[] urls = teUrl.getText().replaceAll(";", "").split("\n");
 		String url = "";
-		String[] imgUrls = teImgUrl.getText().split("\n");
+		String imgUrl = teImgUrl.getText()/*.split("\n")*/;
+		int startIndex = imgUrl.indexOf("pub=")+("pub=").length();
+		String pub = imgUrl.substring(startIndex,imgUrl.indexOf("&", startIndex));
+		startIndex = imgUrl.indexOf("langwritten=")+("langwritten=").length();
+		String locale = imgUrl.substring(startIndex,imgUrl.indexOf("&", startIndex));
+		String pubFull = pub+"_"+locale;
+		if(imgUrl.indexOf("issue=")>-1){
+			startIndex = imgUrl.indexOf("issue=")+("issue=").length();
+			String issue = imgUrl.substring(startIndex,imgUrl.indexOf("&", startIndex));
+			pubFull = pubFull+"_"+issue;
+		}
+		pubFull+=".pdf";
 		String imgurl = "";
 		/*if (_cbJson.isSelected()) new File(tffilename+".json").delete();
 		if (_cbSQL.isSelected()) new File(tffilename+".sql").delete();
@@ -203,7 +215,7 @@ public class CoverGeneratorUI extends JFrame implements ClipboardOwner{
 		*/
 		if (_cbSQL.isSelected()){
 			String content = "";
-			for (String string : urls) {
+			/*for (String string : urls) {
 				String filename = string.substring(string.lastIndexOf("/")+1, string.length());
 				System.out.println(filename);
 				for (String string2 : imgUrls) {
@@ -213,6 +225,9 @@ public class CoverGeneratorUI extends JFrame implements ClipboardOwner{
 					}
 				}
 				content += new GenerateSQL(filename,string,imgurl).generate();
+			}*/
+			for (String key : Pubs.LocaleMap().keySet()) {
+				
 			}
 			IOUtil.overwriteFile(content, tffilename+".sql","UTF-8");
 			//IOUtil.writeFile("update miniwl.app_info set db_refresh = "+new Date().getTime()+";", tffilename+".sql","UTF-8");

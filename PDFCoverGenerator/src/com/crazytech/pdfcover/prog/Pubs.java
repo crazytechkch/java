@@ -18,6 +18,9 @@ public class Pubs {
 	public static void main(String[] args) {
 		Pubs pubs = new Pubs("ws_E_20140701");
 		System.out.println(pubs.filename+"|"+pubs.description()+"|"+(pubs.isG()||pubs.isW()?pubs.issueDateLong():""));
+		for (String key : LocaleMap().keySet()) {
+			System.out.println(key);
+		}
 	}
 	
 	public Pubs(String filename) {
@@ -33,6 +36,20 @@ public class Pubs {
 		wtPubsLocaleMap.put("KO", "ko");
 		wtPubsLocaleMap.put("ML", "ms");
 	}
+	
+	public static Map<String,String> LocaleMap() {
+		Map<String,String> map = new HashMap<String, String>();
+		map.put("E", "en");
+		map.put("X", "de");
+		map.put("S", "es");
+		map.put("F", "fr");
+		map.put("CHS", "zh");
+		map.put("J", "ja");
+		map.put("KO", "ko");
+		map.put("ML", "ms");
+		return map;
+	}
+	
 
 	public String description(){
 		String pubName = "";

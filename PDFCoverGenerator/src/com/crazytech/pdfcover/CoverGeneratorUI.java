@@ -48,11 +48,11 @@ public class CoverGeneratorUI extends JFrame implements ClipboardOwner{
 
 	private JPanel _contentPane;
 	private JTextArea _tfUrls;
-	private DragDropTextEditor teUrl, teImgUrl;
+	private DragDropTextEditor teUrl;
 	private JPanel _panel;
 	private JCheckBox _cbCover;
 	private JCheckBox _cbSQL;
-	private final JCheckBox _cbJson = new JCheckBox("JSON");
+	private JCheckBox _cbJson;
 	private JCheckBox _cbPdfbox;
 	private JTextArea _tfPage;
 	private JTextField _tfTime;
@@ -90,7 +90,7 @@ public class CoverGeneratorUI extends JFrame implements ClipboardOwner{
 		_contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		_contentPane.setLayout(new MigLayout("", "[221px,grow][221px]", "[grow][273px][grow][250px][grow]"));
 		init();
-		detectClipboardChanges();
+		//detectClipboardChanges();
 		ScheduledExecutorService schEx = Executors.newSingleThreadScheduledExecutor();
 		Runnable updateTime = new Runnable() {
 			@Override
@@ -108,9 +108,6 @@ public class CoverGeneratorUI extends JFrame implements ClipboardOwner{
 		teUrl = new DragDropTextEditor("PDF URL", new Locale("en"),"D:/download/temp");
 		_contentPane.add(teUrl, "cell 0 0 2 2,grow");
 		
-		teImgUrl = new DragDropTextEditor("Image URL", new Locale("en"), "D:/download/temp");
-		_contentPane.add(teImgUrl, "cell 0 2 2 2,grow");
-		
 		_panel = new JPanel();
 		_contentPane.add(_panel, "cell 0 4 2 1,grow");
 		_panel.setLayout(new MigLayout("", "[1px,grow][33px][83px,grow][51px][][grow]", "[1px,grow][grow][23px][23px][23px]"));
@@ -123,6 +120,7 @@ public class CoverGeneratorUI extends JFrame implements ClipboardOwner{
 		_cbSQL.setSelected(true);
 		_panel.add(_cbSQL, "cell 2 0,alignx left,aligny center");
 		
+		_cbJson = new JCheckBox("JSON");
 		_cbJson.setSelected(false);
 		_panel.add(_cbJson, "flowx,cell 3 0,alignx left,aligny center");
 		
@@ -175,20 +173,47 @@ public class CoverGeneratorUI extends JFrame implements ClipboardOwner{
 		String src = System.getProperty("user.dir");
 		File dir = new File(src);
 		String[] urls = teUrl.getText().replaceAll(";", "").split("\n");
-		String url = "";
-		String imgUrl = teImgUrl.getText()/*.split("\n")*/;
+		String imgUrl = teUrl.getText()/*.split("\n")*/;
 		int startIndex = imgUrl.indexOf("pub=")+("pub=").length();
 		String pub = imgUrl.substring(startIndex,imgUrl.indexOf("&", startIndex));
 		startIndex = imgUrl.indexOf("langwritten=")+("langwritten=").length();
 		String locale = imgUrl.substring(startIndex,imgUrl.indexOf("&", startIndex));
 		String pubFull = pub+"_"+locale;
+		String issue = "";
 		if(imgUrl.indexOf("issue=")>-1){
 			startIndex = imgUrl.indexOf("issue=")+("issue=").length();
-			String issue = imgUrl.substring(startIndex,imgUrl.indexOf("&", startIndex));
+			issue = imgUrl.substring(startIndex,imgUrl.indexOf("&", startIndex));
 			pubFull = pubFull+"_"+issue;
 		}
 		pubFull+=".pdf";
 		String imgurl = "";
+		Application app = new Application();
+		for (String wtLocale : Pubs.LocaleMap().keySet()) {
+			String url = "http://www.jw.org/download/?"+(!issue.equals("")?("issue="+issue+"&"):"")+"output=html&pub="+pub+"&fileformat=EPUB%2CPDF%2CBRL%2CRTF%2CMOBI&alllangs=0&langwritten="+wtLocale+"&txtCMSLang="+wtLocale+"&isBible=0";
+			String sb = app.decodeHttp(url);
+			//String sb = app.decodeHttp("http://www.jw.org/download/?issue=20151015&output=html&pub=w&fileformat=EPUB%2CPDF%2CBRL%2CRTF%2CMOBI&alllangs=0&langwritten=x&txtCMSLang=x&isBible=0");
+			//System.out.println(sb);
+			String jwDomain = "http://www.jw.org/";
+			startIndex = sb.indexOf("<img src=\"");
+			String imagePath = sb.substring(startIndex+10, sb.indexOf("\" alt=\"\"", startIndex));
+			imagePath = jwDomain+imagePath.replace("_xs.jpg", "_md.jpg");
+			System.out.println(imagePath);
+			startIndex = sb.indexOf("<iframe src=");
+			String iframePath = sb.substring(startIndex+14,sb.indexOf("\"></iframe>", startIndex));
+			iframePath = jwDomain+iframePath;
+			//iframePath = iframePath.replace("output=html", "output=json");
+			System.out.println(iframePath);
+			String sbIframe = app.decodeHttp(iframePath);
+			if (!sbIframe.endsWith("application/octet-stream")) {
+				startIndex = sbIframe.indexOf("<title>");
+				String desc = sbIframe.substring(startIndex+7,sbIframe.indexOf("</title>", startIndex));
+				desc = desc.replace("&nbsp;", " ").replace("<br/>", " ");
+				System.out.println(desc);
+				startIndex = sbIframe.indexOf("<a href=\"", sbIframe.indexOf("PDF</caption>"))+9;
+				String pdf = sbIframe.substring(startIndex, sbIframe.indexOf("\"", startIndex));
+				System.out.println(pdf);
+			} 
+		}
 		/*if (_cbJson.isSelected()) new File(tffilename+".json").delete();
 		if (_cbSQL.isSelected()) new File(tffilename+".sql").delete();
 		for (File file : dir.listFiles()) {
@@ -233,7 +258,7 @@ public class CoverGeneratorUI extends JFrame implements ClipboardOwner{
 			//IOUtil.writeFile("update miniwl.app_info set db_refresh = "+new Date().getTime()+";", tffilename+".sql","UTF-8");
 		}
 	}
-
+	/*
 	protected void detectClipboardChanges() throws InterruptedException {
 		final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 		clipboard.addFlavorListener(new FlavorListener() {
@@ -262,7 +287,7 @@ public class CoverGeneratorUI extends JFrame implements ClipboardOwner{
 				}
 			}
 		});
-	}
+	}*/
 
 	@Override
 	public void lostOwnership(Clipboard clipboard, Transferable contents) {
@@ -301,7 +326,7 @@ public class CoverGeneratorUI extends JFrame implements ClipboardOwner{
 		
 		@Override
 		protected String doInBackground() throws Exception {
-			teImgUrl.setText(url);
+			//teImgUrl.setText(url);
 			return null;
 		}
 	}

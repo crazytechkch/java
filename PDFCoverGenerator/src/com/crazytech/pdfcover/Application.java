@@ -40,7 +40,7 @@ public class Application{
 	 */
 	public static void main(String[] args) {
 		
-		/*EventQueue.invokeLater(new Runnable() {
+		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					final Application window = new Application();
@@ -49,41 +49,8 @@ public class Application{
 					e.printStackTrace();
 				}
 			}
-		});*/
+		});
 		
-		try {
-			Application app = new Application();
-			String sb = app.decodeHttp("http://www.jw.org/download/?issue=20151015&output=html&pub=w&fileformat=EPUB%2CPDF%2CBRL%2CRTF%2CMOBI&alllangs=0&langwritten=x&txtCMSLang=x&isBible=0");
-			//System.out.println(sb);
-			String jwDomain = "http://www.jw.org/";
-			int startIndex = sb.indexOf("<img src=\"");
-			String imagePath = sb.substring(startIndex+10, sb.indexOf("\" alt=\"\"", startIndex));
-			imagePath = jwDomain+imagePath.replace("_xs.jpg", "_md.jpg");
-			System.out.println(imagePath);
-			startIndex = sb.indexOf("<iframe src=");
-			String iframePath = sb.substring(startIndex+14,sb.indexOf("\"></iframe>", startIndex));
-			iframePath = jwDomain+iframePath;
-			//iframePath = iframePath.replace("output=html", "output=json");
-			System.out.println(iframePath);
-			String sbIframe = app.decodeHttp(iframePath);
-			if (!sbIframe.endsWith("application/octet-stream")) {
-				startIndex = sbIframe.indexOf("<title>");
-				String desc = sbIframe.substring(startIndex+7,sbIframe.indexOf("</title>", startIndex));
-				desc = desc.replace("&nbsp;", " ").replace("<br/>", " ");
-				System.out.println(desc);
-				startIndex = sbIframe.indexOf("<a href=\"", sbIframe.indexOf("PDF</caption>"))+9;
-				String pdf = sbIframe.substring(startIndex, sbIframe.indexOf("\"", startIndex));
-				System.out.println(pdf);
-			} 
-		} /*catch (SocketTimeoutException e) {
-			e.printStackTrace();
-		} */catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
 	}
 	
@@ -130,13 +97,8 @@ public class Application{
 		_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		try {
-			tabbedPane.addTab("Cover Generator", new CoverGeneratorUI().getContentPane());
-			tabbedPane.addTab("BiEs Generator", new BiesUI().getContentPane());
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		tabbedPane.addTab("Cover Generator", new GeneratorUI().getContentPane());
+		tabbedPane.addTab("BiEs Generator", new BiesUI().getContentPane());
 		_frame.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 	}
 	

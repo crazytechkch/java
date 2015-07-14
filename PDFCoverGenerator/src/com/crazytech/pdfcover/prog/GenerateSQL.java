@@ -7,37 +7,33 @@ import com.crazytech.io.IOUtil;
 
 
 public class GenerateSQL {
-	private String filename;
-	private String url, imgUrl;
 	private Pubs pubs;
-	public GenerateSQL(String filename, String url, String imgUrl) {
+	public GenerateSQL() {
 		super();
-		this.filename = filename.split(".pdf")[0];
-		this.url = url;
-		this.imgUrl = imgUrl;
 	}
 	
-	public String generate() throws IOException {
+	public String generate(String dbSchema, String tableName, String filename, String url, String imgUrl, String desc, String locale) throws IOException {
 		pubs = new Pubs(filename);
+		filename = filename.replace(".pdf", "");
 		String line = "";
 		if (pubs.isW()||pubs.isG()||pubs.isOkm())
-			line = "insert into miniwl."+pubs.table()+" (filename,description,issue_date,locale,url,imgurl) "
+			line = "insert into "+dbSchema+"."+tableName+" (filename,description,issue_date,locale,url,imgurl) "
 				+"select * from (select "
 				+"'"+filename+"',"
-				+"'"+pubs.description()+"',"
+				+"'"+desc+"',"
 				+"'"+pubs.issueDateLong()+"',"
-				+"'"+pubs.pubLocale()+"',"
+				+"'"+locale+"',"
 				+"'"+url+"','"+imgUrl+"')"
-				+"as tmp where not exists(select filename from miniwl."+pubs.table()+" where filename = '"+filename+"')"
+				+"as tmp where not exists(select filename from "+dbSchema+"."+tableName+" where filename = '"+filename+"')"
 				+ ";";
 		else 
-			line = "insert into miniwl."+pubs.table()+" (filename,description,locale,url,imgurl) "
+			line = "insert into "+dbSchema+"."+tableName+" (filename,description,locale,url,imgurl) "
 					+"select * from (select "
 					+"'"+filename+"',"
-					+"'"+pubs.description()+"',"
-					+"'"+pubs.pubLocale()+"',"
+					+"'"+desc+"',"
+					+"'"+locale+"',"
 					+"'"+url+"','"+imgUrl+"')"
-					+"as tmp where not exists(select filename from miniwl."+pubs.table()+" where filename = '"+filename+"')"
+					+"as tmp where not exists(select filename from "+dbSchema+"."+tableName+" where filename = '"+filename+"')"
 					+ ";";
 		System.out.println(line);
 		return line+"\n";

@@ -6,6 +6,8 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -24,6 +26,7 @@ import com.crazytech.pdfcover.prog.GenerateSQL;
 import com.crazytech.pdfcover.prog.Pubs;
 import com.crazytech.swing.texteditor.DragDropTextEditor;
 
+import java.awt.Component;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -35,6 +38,8 @@ import java.util.Locale;
 import javax.swing.JButton;
 
 import org.apache.http.client.ClientProtocolException;
+
+import javax.swing.JComboBox;
 
 public class GeneratorUI extends JFrame {
 
@@ -52,6 +57,10 @@ public class GeneratorUI extends JFrame {
 	private JPanel panel_south;
 	private JButton btnExe;
 	private DragDropTextEditor teOutput;
+	private JLabel lbDbSchema;
+	private JTextField tfDbSchema;
+	private JLabel lbTableName;
+	private JComboBox cbtfTableName;
 
 	/**
 	 * Launch the application.
@@ -92,6 +101,24 @@ public class GeneratorUI extends JFrame {
 		panel_north.add(lbUrl);
 		
 		tfUrl = new JTextField();
+		tfUrl.getDocument().addDocumentListener(new DocumentListener() {
+			
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				new PopulateTextFields(tfUrl.getText()).execute();
+			}
+			
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				new PopulateTextFields(tfUrl.getText()).execute();
+			}
+			
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				
+				new PopulateTextFields(tfUrl.getText()).execute();
+			}
+		});
 		panel_north.add(tfUrl);
 		tfUrl.setColumns(10);
 		
@@ -99,13 +126,14 @@ public class GeneratorUI extends JFrame {
 		contentPane.add(panel_west, BorderLayout.WEST);
 		GridBagLayout gbl_panel_west = new GridBagLayout();
 		gbl_panel_west.columnWidths = new int[]{0, 0, 0};
-		gbl_panel_west.rowHeights = new int[]{0, 0, 0};
-		gbl_panel_west.columnWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
-		gbl_panel_west.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel_west.rowHeights = new int[]{0, 0, 0, 0, 0};
+		gbl_panel_west.columnWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
+		gbl_panel_west.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		panel_west.setLayout(gbl_panel_west);
 		
 		lbPub = new JLabel("Pub");
 		GridBagConstraints gbc_lbPub = new GridBagConstraints();
+		gbc_lbPub.anchor = GridBagConstraints.WEST;
 		gbc_lbPub.insets = new Insets(0, 0, 5, 5);
 		gbc_lbPub.gridx = 0;
 		gbc_lbPub.gridy = 0;
@@ -113,6 +141,7 @@ public class GeneratorUI extends JFrame {
 		
 		lbPubVal = new JLabel("Pub Value");
 		GridBagConstraints gbc_lbPubVal = new GridBagConstraints();
+		gbc_lbPubVal.anchor = GridBagConstraints.WEST;
 		gbc_lbPubVal.insets = new Insets(0, 0, 5, 0);
 		gbc_lbPubVal.gridx = 1;
 		gbc_lbPubVal.gridy = 0;
@@ -120,16 +149,60 @@ public class GeneratorUI extends JFrame {
 		
 		lbIssue = new JLabel("Issue");
 		GridBagConstraints gbc_lbIssue = new GridBagConstraints();
-		gbc_lbIssue.insets = new Insets(0, 0, 0, 5);
+		gbc_lbIssue.anchor = GridBagConstraints.WEST;
+		gbc_lbIssue.insets = new Insets(0, 0, 5, 5);
 		gbc_lbIssue.gridx = 0;
 		gbc_lbIssue.gridy = 1;
 		panel_west.add(lbIssue, gbc_lbIssue);
 		
 		lbIssueVal = new JLabel("Issue Value");
 		GridBagConstraints gbc_lbIssueVal = new GridBagConstraints();
+		gbc_lbIssueVal.anchor = GridBagConstraints.WEST;
+		gbc_lbIssueVal.insets = new Insets(0, 0, 5, 0);
 		gbc_lbIssueVal.gridx = 1;
 		gbc_lbIssueVal.gridy = 1;
 		panel_west.add(lbIssueVal, gbc_lbIssueVal);
+		
+		lbDbSchema = new JLabel("DB Schema");
+		GridBagConstraints gbc_lbDbSchema = new GridBagConstraints();
+		gbc_lbDbSchema.anchor = GridBagConstraints.WEST;
+		gbc_lbDbSchema.insets = new Insets(0, 0, 5, 5);
+		gbc_lbDbSchema.gridx = 0;
+		gbc_lbDbSchema.gridy = 2;
+		panel_west.add(lbDbSchema, gbc_lbDbSchema);
+		
+		tfDbSchema = new JTextField();
+		GridBagConstraints gbc_tfDbSchema = new GridBagConstraints();
+		gbc_tfDbSchema.fill = GridBagConstraints.HORIZONTAL;
+		gbc_tfDbSchema.insets = new Insets(0, 0, 5, 0);
+		gbc_tfDbSchema.anchor = GridBagConstraints.NORTH;
+		gbc_tfDbSchema.gridx = 1;
+		gbc_tfDbSchema.gridy = 2;
+		panel_west.add(tfDbSchema, gbc_tfDbSchema);
+		tfDbSchema.setText("phpmysql");
+		tfDbSchema.setColumns(10);
+		
+		lbTableName = new JLabel("Table Name");
+		GridBagConstraints gbc_lbTableName = new GridBagConstraints();
+		gbc_lbTableName.anchor = GridBagConstraints.EAST;
+		gbc_lbTableName.insets = new Insets(0, 0, 0, 5);
+		gbc_lbTableName.gridx = 0;
+		gbc_lbTableName.gridy = 3;
+		panel_west.add(lbTableName, gbc_lbTableName);
+		
+		cbtfTableName = new JComboBox();
+		GridBagConstraints gbc_cbtfTableName = new GridBagConstraints();
+		gbc_cbtfTableName.fill = GridBagConstraints.HORIZONTAL;
+		gbc_cbtfTableName.gridx = 1;
+		gbc_cbtfTableName.gridy = 3;
+		cbtfTableName.addItem("pubs_wt");
+		cbtfTableName.addItem("pubs_g");
+		cbtfTableName.addItem("pubs_books");
+		cbtfTableName.addItem("pubs_brochures");
+		cbtfTableName.addItem("pubs_booklets");
+		cbtfTableName.addItem("pubs_okm");
+		cbtfTableName.addItem("pubs_yearbooks");
+		panel_west.add(cbtfTableName, gbc_cbtfTableName);
 		
 		panel_center = new JPanel();
 		panel_center.setLayout(new BoxLayout(panel_center, BoxLayout.X_AXIS));
@@ -151,6 +224,7 @@ public class GeneratorUI extends JFrame {
 		panel_south.add(btnExe);
 		
 	}
+	
 	
 	private void execute(String url){
 		teOutput.setText("");
@@ -202,7 +276,7 @@ public class GeneratorUI extends JFrame {
 					startIndex = sbIframe.indexOf("<a href=\"", sbIframe.indexOf("PDF</caption>"))+9;
 					String pdf = sbIframe.substring(startIndex, sbIframe.indexOf("\"", startIndex));
 					System.out.println(pdf);
-					new AddToOutput(new GenerateSQL(pubFull, pdf, imagePath).generate()).execute();
+					new AddToOutput(new GenerateSQL().generate(tfDbSchema.getText(),cbtfTableName.getSelectedItem().toString(),pubFull, pdf, imagePath,desc,Pubs.LocaleMap().get(wtLocale))).execute();
 				} 
 			} catch (StringIndexOutOfBoundsException e) {
 				// TODO Auto-generated catch block
@@ -215,6 +289,43 @@ public class GeneratorUI extends JFrame {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	private class PopulateTextFields extends SwingWorker<String, String> {
+		private String pub, issue;
+		
+		
+
+		public PopulateTextFields(String url) {
+			super();
+			int startIndex = url.indexOf("pub=")+("pub=").length();
+			String pub = url.substring(startIndex,url.indexOf("&", startIndex));
+			startIndex = url.indexOf("langwritten=")+("langwritten=").length();
+			String locale = url.substring(startIndex,url.indexOf("&", startIndex));
+			String loopUrl = "";
+			String pubFull = pub+"_"+locale;
+			String issue = "";
+			if(url.indexOf("issue=")>-1){
+				startIndex = url.indexOf("issue=")+("issue=").length();
+				issue = url.substring(startIndex,url.indexOf("&", startIndex));
+				pubFull = pubFull+"_"+issue;
+			}
+			this.pub = pub;
+			this.issue = issue;
+		}
+
+
+
+		@Override
+		protected String doInBackground() throws Exception {
+			lbPubVal.setText(pub);
+			lbIssueVal.setText(issue);
+			if(pub.equals("w")||pub.equals("ws"))cbtfTableName.setSelectedItem("pubs_wt");
+			else if(pub.equals("g"))cbtfTableName.setSelectedItem("pubs_g");
+			return null;
+		}
+		
+		
 	}
 	
 	private class AddToOutput extends SwingWorker<String,String> {

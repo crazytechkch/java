@@ -32,12 +32,22 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Locale;
 
 import javax.swing.JButton;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 
 import javax.swing.JComboBox;
 
@@ -253,7 +263,7 @@ public class GeneratorUI extends JFrame {
 			}
 			pubFull+=".pdf";
 			try {
-				String sb = app.decodeHttp(loopUrl);
+				String sb = decodeHttp(loopUrl);
 				//String sb = app.decodeHttp("http://www.jw.org/download/?issue=20151015&output=html&pub=w&fileformat=EPUB%2CPDF%2CBRL%2CRTF%2CMOBI&alllangs=0&langwritten=x&txtCMSLang=x&isBible=0");
 				//System.out.println(sb);
 				String jwDomain = "http://www.jw.org/";
@@ -267,7 +277,7 @@ public class GeneratorUI extends JFrame {
 				//iframePath = iframePath.replace("output=html", "output=json");
 				System.out.println(iframePath);
 				String sbIframe;
-				sbIframe = app.decodeHttp(iframePath);
+				sbIframe = decodeHttp(iframePath);
 				if (!sbIframe.endsWith("application/octet-stream")) {
 					startIndex = sbIframe.indexOf("<title>");
 					String desc = sbIframe.substring(startIndex+7,sbIframe.indexOf("</title>", startIndex));
@@ -290,6 +300,32 @@ public class GeneratorUI extends JFrame {
 			}
 		}
 	}
+	
+
+	public String decodeHttp(String url) throws ClientProtocolException,IOException {
+		DefaultHttpClient httpClient = new DefaultHttpClient();
+		int timeoutConnection = 3000;
+		HttpParams httpParameters = new BasicHttpParams();
+		HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+		httpClient.setParams(httpParameters);
+		int timeoutSocket = 5000;
+		HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+		HttpGet httpGet = new HttpGet(url);
+		HttpResponse httpResponse = httpClient.execute(httpGet);
+		
+		HttpEntity httpEntity = httpResponse.getEntity();
+		InputStream is = httpEntity.getContent();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(
+				is, /*"iso-8859-1"*/"utf-8"), 8);
+		StringBuilder sb = new StringBuilder();
+		String line = null;
+		while ((line = reader.readLine()) != null) {
+			sb.append(line + "\n");
+		}
+		is.close();
+		return sb.toString()+httpEntity.getContentType().toString();
+	}
+
 	
 	private class PopulateTextFields extends SwingWorker<String, String> {
 		private String pub, issue;

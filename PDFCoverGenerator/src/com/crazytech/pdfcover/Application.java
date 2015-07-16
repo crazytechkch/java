@@ -54,30 +54,6 @@ public class Application{
 		
 	}
 	
-	public String decodeHttp(String url) throws ClientProtocolException,IOException {
-		DefaultHttpClient httpClient = new DefaultHttpClient();
-		int timeoutConnection = 3000;
-		HttpParams httpParameters = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
-		httpClient.setParams(httpParameters);
-		int timeoutSocket = 5000;
-		HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
-		HttpGet httpGet = new HttpGet(url);
-		HttpResponse httpResponse = httpClient.execute(httpGet);
-		
-		HttpEntity httpEntity = httpResponse.getEntity();
-		InputStream is = httpEntity.getContent();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				is, /*"iso-8859-1"*/"utf-8"), 8);
-		StringBuilder sb = new StringBuilder();
-		String line = null;
-		while ((line = reader.readLine()) != null) {
-			sb.append(line + "\n");
-		}
-		is.close();
-		return sb.toString()+httpEntity.getContentType().toString();
-	}
-
 	/**
 	 * Create the application.
 	 */

@@ -174,46 +174,7 @@ public class CoverGeneratorUI extends JFrame implements ClipboardOwner{
 		File dir = new File(src);
 		String[] urls = teUrl.getText().replaceAll(";", "").split("\n");
 		String imgUrl = teUrl.getText()/*.split("\n")*/;
-		int startIndex = imgUrl.indexOf("pub=")+("pub=").length();
-		String pub = imgUrl.substring(startIndex,imgUrl.indexOf("&", startIndex));
-		startIndex = imgUrl.indexOf("langwritten=")+("langwritten=").length();
-		String locale = imgUrl.substring(startIndex,imgUrl.indexOf("&", startIndex));
-		String pubFull = pub+"_"+locale;
-		String issue = "";
-		if(imgUrl.indexOf("issue=")>-1){
-			startIndex = imgUrl.indexOf("issue=")+("issue=").length();
-			issue = imgUrl.substring(startIndex,imgUrl.indexOf("&", startIndex));
-			pubFull = pubFull+"_"+issue;
-		}
-		pubFull+=".pdf";
-		String imgurl = "";
-		Application app = new Application();
-		for (String wtLocale : Pubs.LocaleMap().keySet()) {
-			String url = "http://www.jw.org/download/?"+(!issue.equals("")?("issue="+issue+"&"):"")+"output=html&pub="+pub+"&fileformat=EPUB%2CPDF%2CBRL%2CRTF%2CMOBI&alllangs=0&langwritten="+wtLocale+"&txtCMSLang="+wtLocale+"&isBible=0";
-			String sb = app.decodeHttp(url);
-			//String sb = app.decodeHttp("http://www.jw.org/download/?issue=20151015&output=html&pub=w&fileformat=EPUB%2CPDF%2CBRL%2CRTF%2CMOBI&alllangs=0&langwritten=x&txtCMSLang=x&isBible=0");
-			//System.out.println(sb);
-			String jwDomain = "http://www.jw.org/";
-			startIndex = sb.indexOf("<img src=\"");
-			String imagePath = sb.substring(startIndex+10, sb.indexOf("\" alt=\"\"", startIndex));
-			imagePath = jwDomain+imagePath.replace("_xs.jpg", "_md.jpg");
-			System.out.println(imagePath);
-			startIndex = sb.indexOf("<iframe src=");
-			String iframePath = sb.substring(startIndex+14,sb.indexOf("\"></iframe>", startIndex));
-			iframePath = jwDomain+iframePath;
-			//iframePath = iframePath.replace("output=html", "output=json");
-			System.out.println(iframePath);
-			String sbIframe = app.decodeHttp(iframePath);
-			if (!sbIframe.endsWith("application/octet-stream")) {
-				startIndex = sbIframe.indexOf("<title>");
-				String desc = sbIframe.substring(startIndex+7,sbIframe.indexOf("</title>", startIndex));
-				desc = desc.replace("&nbsp;", " ").replace("<br/>", " ");
-				System.out.println(desc);
-				startIndex = sbIframe.indexOf("<a href=\"", sbIframe.indexOf("PDF</caption>"))+9;
-				String pdf = sbIframe.substring(startIndex, sbIframe.indexOf("\"", startIndex));
-				System.out.println(pdf);
-			} 
-		}
+		
 		/*if (_cbJson.isSelected()) new File(tffilename+".json").delete();
 		if (_cbSQL.isSelected()) new File(tffilename+".sql").delete();
 		for (File file : dir.listFiles()) {

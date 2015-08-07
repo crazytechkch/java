@@ -1,7 +1,6 @@
 package com.crazytech.pdfcover;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -27,6 +26,7 @@ import com.crazytech.pdfcover.prog.Pubs;
 import com.crazytech.swing.texteditor.DragDropTextEditor;
 
 import java.awt.Component;
+import java.awt.EventQueue;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;

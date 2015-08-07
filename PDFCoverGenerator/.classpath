@@ -11,7 +11,8 @@
 	<classpathentry kind="lib" path="D:/workspace/libraries/jcalendar-1.4.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox-1.8.4.jar"/>
 	<classpathentry kind="lib" path="lib/pdf-renderer-1.0.5.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/ApacheHttp"/>
 	<classpathentry kind="lib" path="D:/workspace/libraries/xswingx.jar"/>
+	<classpathentry kind="lib" path="lib/httpclient-4.5.jar"/>
+	<classpathentry kind="lib" path="lib/httpcore-4.4.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
